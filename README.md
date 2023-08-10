@@ -20,9 +20,10 @@ Starting from  a set of raw fastq files demultiplexed.
 
 
 #### Step 0 - trim sequences to target hifi reads within length parameters for our amplicon
+```
 seqtk comp $file | awk '{ if ((\$2 >= 1300) && (\$2 <= 1600)) { print} }' | cut --fields 1 > reads_list/$2.list";
 seqtk subseq $file reads_list/$2.list > reads_trimmed_1/demultiplex.$1."."_trim.fastq";
-
+```
 
 We use 1300 to 1600 bp
 
@@ -111,11 +112,19 @@ qiime feature-classifier classify-consensus-vsearch \
 
 ##### Step 4.2.2 - merge and prepare the taxonomy and ASV table
 
-* `qiime feature-table merge-taxa --i-data vsearch_R1.TAX.3.qza --i-data vsearch_R2.TAX.3.qza --o-merged-data vsearch_merged.qza`
-* `unzip -d vsearch_merged_dir vsearch_merged.qza`
-* `unzip -d sklearn_taxonomy_dir sklearn_taxonomy.qza`
-* `unzip -d biom_table_dir dada2_output/table.qza`
-  - `biom convert --to-tsv -i biom_table_dir/[random_string]/data/feature-table.biom -o test.biom`
+* ```
+  qiime feature-table merge-taxa --i-data vsearch_R1.TAX.3.qza --i-data vsearch_R2.TAX.3.qza --o-merged-data vsearch_merged.qza
+  ```
+* ```
+  unzip -d vsearch_merged_dir vsearch_merged.qza
+  ```
+* ```
+  unzip -d sklearn_taxonomy_dir sklearn_taxonomy.qza
+  ```
+* ```
+  unzip -d biom_table_dir dada2_output/table.qza
+  biom convert --to-tsv -i biom_table_dir/[random_string]/data/feature-table.biom -o test.biom
+  ```
 ##### Step 5 - Roll back the Taxonomy
 
 Hard coded paths to point the right files for now 
