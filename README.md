@@ -26,13 +26,13 @@ seqtk subseq $file reads_list/$2.list > reads_trimmed_1/demultiplex.$1."."_trim.
 
 We use 1300 to 1600 bp
 
-### Step 1 - make a qiime manifest file (make_pacbio_manifest.pl)
+#### Step 1 - make a qiime manifest file (make_pacbio_manifest.pl)
 This is a tab delimited file that needs to have special headers
 "sample-id"[TAB]"absolute-filepath"
 
 make_pacbio_manifest.pl loops through the files in the directory output from step0
 
-### Step 2 - Load fastq files into qiime2 archive format.
+#### Step 2 - Load fastq files into qiime2 archive format.
 Single threaded can be slow
 ```
 qiime tools import \
@@ -42,7 +42,7 @@ qiime tools import \
        --input-format SingleEndFastqManifestPhred33V2
 ```
        
-### Step 3 - Denoise reads using denoise-ccs from qiime2.
+#### Step 3 - Denoise reads using denoise-ccs from qiime2.
 
 ```
  qiime dada2 denoise-ccs \
@@ -61,8 +61,8 @@ qiime tools import \
    --verbose
 ```
 
-### Step 4 - Assign Taxonomy
-#### Step 4.1 - SKlearn
+#### Step 4 - Assign Taxonomy
+##### Step 4.1 - SKlearn
 
 ```
 qiime feature-classifier classify-sklearn \
@@ -73,7 +73,7 @@ qiime feature-classifier classify-sklearn \
       --p-n-jobs 45
 ```
 
-#### Step 4.2 - 2 rounds of Vsearch
+##### Step 4.2 - 2 rounds of Vsearch
 
 Round 1 - very stringent on coverage identity
 ``` 
@@ -109,14 +109,14 @@ qiime feature-classifier classify-consensus-vsearch \
 ```
 
 
-#### Step 4.2.2 - merge and prepare the taxonomy and ASV table
+##### Step 4.2.2 - merge and prepare the taxonomy and ASV table
 
 * `qiime feature-table merge-taxa --i-data vsearch_R1.TAX.3.qza --i-data vsearch_R2.TAX.3.qza --o-merged-data vsearch_merged.qza`
 * `unzip -d vsearch_merged_dir vsearch_merged.qza`
 * `unzip -d sklearn_taxonomy_dir sklearn_taxonomy.qza`
 * `unzip -d biom_table_dir dada2_output/table.qza`
   - `biom convert --to-tsv -i biom_table_dir/[random_string]/data/feature-table.biom -o test.biom`
-#### Step 5 - Roll back the Taxonomy
+##### Step 5 - Roll back the Taxonomy
 
 Hard coded paths to point the right files for now 
 
