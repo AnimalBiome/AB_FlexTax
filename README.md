@@ -130,3 +130,28 @@ qiime feature-classifier classify-consensus-vsearch \
 Hard coded paths to point the right files for now 
 
 `Rscript Genus_Confidence_Rollback.Rmd`;
+
+This script will compare the taxonomic assingment between the sklearn and vsearch labels.
+Using confidence and consensus scores, a set of rules were designed to apply the final label.
+1. If the labels are the same, keep the label.
+2. If the labels are the same and the confidence/consensus values are low, then roll back to genus level using the SKlearn label.
+3. If Vsearch is Unassigned and the confidence from sklearn is high, use the sklearn label.
+4. If the labels are not the same and the SKlearn confidence is low while the consensus from vsearch is 1 and vsearch is not Unassigned, then use the Vsearch label
+5. If the labels are not the same and the SKlearn confidence is high while the consensus from vsearch is 1 and vsearch is not Unassigned, then use the SKlearn label
+6. If the labels are not the same and the confidence/consensus scores are low and vsearch is not Unassigned, then roll back to genus level using SKlearn label.
+7. If Vsearch is Unassgined, and the sklearn confidence is low, then roll back to genus using the SKlearn label.
+```
+Taxon_MERGED_rolled = case_when(Taxon_VSEARCH == Taxon_SKLEARN ~ Taxon_VSEARCH,
+                                Taxon_VSEARCH == Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric >= 0.75 ~ Taxon_SKLEARN,
+                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_VSEARCH,
+                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric >= 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_SKLEARN,
+                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 & Taxon_VSEARCH != "Unassigned" ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric < 0.75 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                TRUE ~ Taxon_SKLEARN)
+```
+
+### Output files
+
+
+###
