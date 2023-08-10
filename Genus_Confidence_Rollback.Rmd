@@ -1,0 +1,156 @@
+---
+title: "Genus_Confidence_Rollback"
+author: "GJ"
+date: "7/17/2023"
+output: html_document
+---
+
+# Setup
+Libraries and color palette
+```{r}
+suppressMessages(library(here))
+suppressMessages(library(tidyverse))
+suppressMessages(library(processx))
+suppressMessages(library(RPostgres))
+suppressMessages(library(httr))
+suppressMessages(library(dbplyr))
+suppressMessages(library(odbc))
+suppressMessages(library(RPostgreSQL))
+suppressMessages(library(glue))
+suppressMessages(library(base))
+suppressMessages(library(phyloseq))
+suppressMessages(library(lubridate))
+suppressMessages(library(randomizr))
+```
+
+
+# Load Data
+```{r load_data}
+Biom_table_ASV <- read.csv(here::here("DB_curation/verification/dada2_biom_table.tsv"), sep = "\t", header = TRUE, na.strings = "", skip = 1,comment.char = '') %>% as.data.frame() 
+
+loop_indices<-grep("^X\\d.....", colnames(Biom_table_ASV), perl=TRUE)
+    for(i in loop_indices){
+     # next if(i >= A_indices)
+      colnames(Biom_table_ASV)[i] <- gsub("^X", "", colnames(Biom_table_ASV)[i])
+}
+
+# Read in the taxonomy files
+# Vsearch
+taxonmy_vsearch_ASV <- read.csv(here::here("DB_curation/verification/vsearch_RD_merged/data/taxonomy.tsv"), sep = "\t", header = TRUE, na.strings = "", skip = 0,comment.char = '') %>% as.data.frame() 
+# SKlearn
+taxonmy_sklearn_ASV <- read.csv(here::here("DB_curation/verification/sklearn_RD_taxonomy/data/taxonomy.tsv"), sep = "\t", header = TRUE, na.strings = "", skip = 0,comment.char = '') %>% as.data.frame() 
+
+Biom_table_ASV.curate <- Biom_table_ASV %>%
+  left_join(taxonmy_sklearn_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  left_join(taxonmy_vsearch_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  dplyr::select(X.OTU.ID, Taxon.x, Confidence, Taxon.y,Consensus,starts_with("zymogut"))
+
+
+Biom_table_rolled_ASV <- Biom_table_ASV %>%
+  left_join(taxonmy_sklearn_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  left_join(taxonmy_vsearch_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  dplyr::rename(Taxon_SKLEARN=Taxon.x,
+                Taxon_VSEARCH=Taxon.y) %>%
+  dplyr::mutate(Confidence_numeric = as.numeric(Confidence),
+                Consensus_numeric = as.numeric(Consensus),
+                Taxon_MERGED_rolled = case_when(Taxon_VSEARCH == Taxon_SKLEARN ~ Taxon_VSEARCH,
+                                                Taxon_VSEARCH == Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric >= 0.75 ~ Taxon_SKLEARN,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_VSEARCH,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric >= 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_SKLEARN,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 & Taxon_VSEARCH != "Unassigned" ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric < 0.75 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                TRUE ~ Taxon_SKLEARN)) %>%
+  arrange(desc(Confidence_numeric))%>%
+  dplyr::select(-Taxon_SKLEARN,-Confidence,-Consensus,-Taxon_VSEARCH) 
+
+
+Biom_table_rolled_ASV.curate <- Biom_table_ASV %>%
+  left_join(taxonmy_sklearn_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  left_join(taxonmy_vsearch_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  dplyr::rename(Taxon_SKLEARN=Taxon.x,
+                Taxon_VSEARCH=Taxon.y) %>%
+  dplyr::mutate(Confidence_numeric = as.numeric(Confidence),
+                Consensus_numeric = as.numeric(Consensus),
+                Taxon_MERGED_rolled = case_when(Taxon_VSEARCH == Taxon_SKLEARN ~ Taxon_VSEARCH,
+                                                Taxon_VSEARCH == Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric >= 0.75 ~ Taxon_SKLEARN,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_VSEARCH,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric >= 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_SKLEARN,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 & Taxon_VSEARCH != "Unassigned" ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric < 0.75 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                TRUE ~ Taxon_SKLEARN)) %>%
+  arrange(desc(Confidence_numeric))%>%
+  dplyr::select(Taxon_SKLEARN,Confidence,Consensus,Taxon_VSEARCH,Taxon_MERGED_rolled) 
+
+
+Biom_table_rolled_ASV.compare <- Biom_table_ASV %>%
+  left_join(taxonmy_sklearn_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  left_join(taxonmy_vsearch_ASV, by=c("X.OTU.ID"="Feature.ID")) %>%
+  dplyr::rename(Taxon_SKLEARN=Taxon.x,
+                Taxon_VSEARCH=Taxon.y) %>%
+  dplyr::mutate(Confidence_numeric = as.numeric(Confidence),
+                Consensus_numeric = as.numeric(Consensus),
+                Taxon_MERGED_rolled = case_when(Taxon_VSEARCH == Taxon_SKLEARN ~ Taxon_VSEARCH,
+                                                Taxon_VSEARCH == Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric >= 0.75 ~ Taxon_SKLEARN,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_VSEARCH,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric >= 0.75 & Consensus_numeric == 1 & Taxon_VSEARCH != "Unassigned"  ~ Taxon_SKLEARN,
+                                                Taxon_VSEARCH != Taxon_SKLEARN & Confidence_numeric < 0.75 & Consensus_numeric < 1 & Taxon_VSEARCH != "Unassigned" ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                Taxon_VSEARCH == "Unassigned" & Confidence_numeric < 0.75 ~ gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                TRUE ~ Taxon_SKLEARN),
+                Taxon_SKLEARN_only_rolled = case_when(Confidence_numeric < 0.75  ~  gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                      TRUE ~ Taxon_SKLEARN),
+                Taxon_Vsearch_only_rolled = case_when(Consensus_numeric < 1  ~  gsub("; s__.*$","; s__",Taxon_SKLEARN,perl=T),
+                                                      Taxon_VSEARCH == "Unassigned"  ~ Taxon_VSEARCH,
+                                                      TRUE ~ Taxon_VSEARCH)) %>%
+  arrange(desc(Confidence_numeric))%>%
+  #dplyr::select(Taxon_SKLEARN,Confidence,Consensus,Taxon_VSEARCH,Taxon_MERGED_rolled,Taxon_SKLEARN_only_rolled,Taxon_Vsearch_only_rolled,) %>%
+  dplyr::select(-Taxon_SKLEARN,-Consensus,-Confidence,-Taxon_VSEARCH) %>%
+   pivot_longer(cols=!c("Taxon_MERGED_rolled","Taxon_SKLEARN_only_rolled","Taxon_Vsearch_only_rolled","X.OTU.ID"), names_to = "SampleID", values_to = "Count") %>%
+  dplyr::mutate(Sample_type = case_when(grepl("Zymo|CTRPOS|zymo|ctrpos",SampleID, perl=T) ~ "Control",
+                                        grepl("ABCS|ABSC",SampleID, perl=T) ~ "Isolate",
+                                        TRUE ~ "Microbial Community")) %>%
+  dplyr::filter(Count >0)
+ 
+
+
+
+
+Biom_table_rolled_ASV.LOGIC_longer <- Biom_table_rolled_ASV %>%
+  # left_join(Hybrid_taxonomy[c("Feature.ID","Taxon")], by=c( "X.OTU.ID"="Feature.ID")) %>%
+  # dplyr::rename(Hybrid_Taxon = Taxon)%>%
+  pivot_longer(cols=!c("Taxon_MERGED_rolled","Confidence_numeric","X.OTU.ID","Consensus_numeric"), names_to = "SampleID", values_to = "Count") %>%
+  group_by(SampleID,Taxon_MERGED_rolled) %>%
+  dplyr::mutate(glom_count = sum(Count))%>%
+  ungroup()%>%
+  #rownames_to_column("TMP")%>%
+  dplyr::select(-X.OTU.ID,-Confidence_numeric,-Count,-Consensus_numeric)%>%
+  unique()
+  
+
+
+
+Biom_table_rolled_LOGIC_species_relab_longer <- Biom_table_rolled_ASV.LOGIC_longer %>%
+  group_by(SampleID) %>%
+  dplyr::mutate(TotalReadCount = sum(glom_count),
+                RelAb = glom_count/TotalReadCount)%>%
+  ungroup()%>%
+  dplyr::select(-TotalReadCount,-glom_count)
+
+
+Biom_table_rolled_LOGIC_species_glom_relativeAbundance <- Biom_table_rolled_LOGIC_species_relab_longer %>%
+   pivot_wider(names_from = SampleID, values_from = RelAb, values_fill = 0)
+
+
+
+#Biom_table_rolled_LOGIC_species_glom_relab_positive_controls <- Biom_table_rolled_LOGIC_species_glom_relativeAbundance %>%
+#  dplyr::select(Taxon_MERGED_rolled,starts_with("zymo"),starts_with("Zymo"),starts_with("CTRPOS"),-CTRPOS1b) %>%
+#  column_to_rownames("Taxon_MERGED_rolled")%>%
+#  dplyr::filter(rowSums(.) > 0) %>%
+#  rownames_to_column("Taxon_MERGED_rolled")
+
+
+
+write.csv(Biom_table_rolled_LOGIC_species_glom_relativeAbundance, file=here::here("Species_lvl_MergedRolledBackTaxonomy.RELAB.csv"), row.names=F, quote=T)
+
