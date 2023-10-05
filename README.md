@@ -6,27 +6,6 @@ This documentation describes AnimalBiome's process for assigning taxonomy to Pac
 
 We first discuss curation of the reference database, then the processing of sequences in QIIME2 with DADA2, then the implementation of the sklearn and VSEARCH classifiers, and lastly the creation of the final consensus taxonomy for our sequences.
 
-## Table of Contents
-
-*   [FlexTax: A flexible hybrid approach to assigning species-level taxonomy to full-length 16S rRNA gene sequences](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-FlexTax:Aflexiblehybridapproachtoassigningspecies-leveltaxonomytofull-length16SrRNAgenesequences)
-    *   [Description](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Description)
-    *   [Table of Contents](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-TableofContents)
-    *   [Process overview and output](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Processoverviewandoutput)
-        *   [Software used in this tutorial](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Softwareusedinthistutorial)
-    *   [#1: Curate Reference Database](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-#1:CurateReferenceDatabase)
-        *   [Database curation process](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Databasecurationprocess)
-    *   [#2: Process PacBio sequences with QIIME2](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-#2:ProcessPacBiosequenceswithQIIME2)
-        *   [Step 2.1 - Trim sequences to only retain HiFi reads within appropriate length parameters](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step2.1-TrimsequencestoonlyretainHiFireadswithinappropriatelengthparameters)
-        *   [Step 2.2 - Make a qiime manifest file](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step2.2-Makeaqiimemanifestfile)
-        *   [Step 2.3 - Store fastq files as a qiime2 archive](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step2.3-Storefastqfilesasaqiime2archive)
-        *   [Step 2.4 - Denoise reads using denoise-ccs](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step2.4-Denoisereadsusingdenoise-ccs)
-    *   [#3: Assign Taxonomy to ASV sequences with the sklearn and VSEARCH qiime classifiers](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-#3:AssignTaxonomytoASVsequenceswiththesklearnandVSEARCHqiimeclassifiers)
-        *   [Step 3.1 - Run sklearn classifier with default confidence threshold (0.7)](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step3.1-Runsklearnclassifierwithdefaultconfidencethreshold(0.7))
-        *   [Step 3.2 - Run two rounds of VSEARCH classification](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step3.2-RuntworoundsofVSEARCHclassification)
-        *   [Step 3.3 - Merge the two VSEARCH taxonomy tables](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step3.3-MergethetwoVSEARCHtaxonomytables)
-        *   [Step 3.4 - Prepare files for import into R](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step3.4-PreparefilesforimportintoR)
-    *   [#4: Create Consensus Taxonomy](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-#4:CreateConsensusTaxonomy)
-    *   [References](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-References)
 
 ## Process overview and output
 
