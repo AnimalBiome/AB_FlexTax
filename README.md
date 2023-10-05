@@ -8,8 +8,6 @@ We first discuss curation of the reference database, then the processing of sequ
 
 ## Table of Contents
 
-/\*<!\[CDATA\[\*/ div.rbtoc1696467718462 {padding: 0px;} div.rbtoc1696467718462 ul {list-style: disc;margin-left: 0px;} div.rbtoc1696467718462 li {margin-left: 0px;padding-left: 0px;} /\*\]\]>\*/
-
 *   [FlexTax: A flexible hybrid approach to assigning species-level taxonomy to full-length 16S rRNA gene sequences](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-FlexTax:Aflexiblehybridapproachtoassigningspecies-leveltaxonomytofull-length16SrRNAgenesequences)
     *   [Description](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Description)
     *   [Table of Contents](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-TableofContents)
@@ -33,7 +31,7 @@ We first discuss curation of the reference database, then the processing of sequ
 
 ## Process overview and output
 
-![](./attachments/RD%20Pipeline%20+%20DB%20Curation%20(4).png?api=v2)
+![RD_SOP](https://github.com/AnimalBiome/16S_Pipeline_RD/assets/67349833/ab40b5b8-ce6a-4fc3-b27f-f054558dff2f)
 
 ### Software used in this tutorial
 
