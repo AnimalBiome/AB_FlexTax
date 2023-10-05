@@ -27,7 +27,6 @@ We first discuss curation of the reference database, then the processing of sequ
         *   [Step 3.4 - Prepare files for import into R](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Step3.4-PreparefilesforimportintoR)
     *   [#4: Create Consensus Taxonomy](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-#4:CreateConsensusTaxonomy)
     *   [References](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-References)
-*   [Content signoffs](#id-(PublicRepoVersion)R&DPipelineCodeandSOP-Contentsignoffs)
 
 ## Process overview and output
 
