@@ -9,7 +9,7 @@ We first discuss curation of the reference database, then the processing of sequ
 
 ## Process overview and output
 
-![RD_SOP](https://github.com/AnimalBiome/AB_FlexTax/assets/67349833/ab40b5b8-ce6a-4fc3-b27f-f054558dff2f)
+![RD_SOP](https://github.com/AnimalBiome/AB_FlexTax/assets/67349833/362e44aa-30e6-4d47-83c9-5613779e094d)
 
 ### Software used in this tutorial
 
