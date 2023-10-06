@@ -1,11 +1,19 @@
+<p align="center">
+  <img src="https://github.com/AnimalBiome/AB_FlexTax/assets/67349833/c51b6072-801b-47a4-91ab-f94e21fcb305" />
+</p>
+
 # FlexTax: A flexible hybrid approach to assigning species-level taxonomy to full-length 16S rRNA gene sequences
+
+## Authorship
+Guillaume Jospin<sup>1</sup>, Brian Park<sup>1</sup>, Connie A. Rojas<sup>1</sup>, Elisa Scarsella<sup>1</sup>, Zhandra Entrolezo<sup>1</sup>, Nancy Alvarado<sup>1</sup>, Daan Reyes<sup>1</sup>, Holly H. Ganz<sup>1</sup>, Jessica K. Jarett<sup>1</sup>
+
+<sup>1</sup>AnimalBiome, Oakland, CA
 
 ## Description
 
 This documentation describes AnimalBiome's process for assigning taxonomy to PacBio full-length 16S rRNA gene HiFi reads. We used both the sklearn and VSEARCH taxonomic classifiers in QIIME2.
 
 We first discuss curation of the reference database, then the processing of sequences in QIIME2 with DADA2, then the implementation of the sklearn and VSEARCH classifiers, and lastly the creation of the final consensus taxonomy for our sequences.
-
 
 ## Process overview and output
 
