@@ -5,7 +5,7 @@
 # FlexTax: A flexible hybrid approach to assigning species-level taxonomy to full-length 16S rRNA gene sequences
 
 ## Authorship
-Guillaume Jospin<sup>1</sup>, Brian Park<sup>1</sup>, Connie A. Rojas<sup>1</sup>, Elisa Scarsella<sup>1</sup>, Zhandra Entrolezo<sup>1</sup>, Nancy Alvarado<sup>1</sup>, Daan Reyes<sup>1</sup>, Holly H. Ganz<sup>1</sup>, Jessica K. Jarett<sup>1</sup>
+Guillaume Jospin<sup>1</sup>, Brian Park<sup>1</sup>, Connie A. Rojas<sup>1</sup>, Elisa Scarsella<sup>1</sup>, Holly H. Ganz<sup>1</sup>, Jessica K. Jarett<sup>1</sup>
 
 <sup>1</sup>AnimalBiome, Oakland, CA
 
