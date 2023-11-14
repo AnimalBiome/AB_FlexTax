@@ -284,8 +284,8 @@ VSEARCH taxonomic assignments are highly accurate but because of the stringency,
 
 ## Acknowledgements
 We want to acknowledge the efforts of our molecular laboratory team who tiredlessly sequenced thousands of samples to generate the data used to evaluate this method.
+Zhandra Entrolezo<sup>1</sup>, Nancy Alvarado<sup>1</sup>, Daan Reyes<sup>1</sup>, Syd Redner<sup>1</sup>, Novia Kayfetz-Vuong<sup>1</sup>, Saranie Pangus<sup>1</sup>, and Carly Pomeroy<sup>1</sup>
 
-We also want to acknowledge our microbial discovery team who graciously provided samples and sequencing help throughout.
 
 ## References
 
