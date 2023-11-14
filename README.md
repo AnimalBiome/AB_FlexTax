@@ -232,7 +232,7 @@ qiime feature-classifier classify-consensus-vsearch \
        --p-perc-identity 0.99 \
        --p-strand plus \
        --p-maxaccepts 10 \
-       --p-query-cov 0.9 \
+       --p-query-cov 0.94 \
        --p-maxrejects 250 \
        --p-top-hits-only \
        --output-dir Vsearch_outDir_Round2
@@ -281,6 +281,11 @@ Taxon_MERGED_rolled_0.7conf = case_when(Taxon_VSEARCH == Taxon_SKLEARN ~ Taxon_V
 ```
 
 VSEARCH taxonomic assignments are highly accurate but because of the stringency, many are “Unassigned”. sklearn gives very accurate taxonomic assignment but sometimes not to species or genus level. We opted to use the sklearn taxonomy as a default, but replaced it with the VSEARCH assignment if the VSEARCH taxonomy was of high confidence (consensus=1). And that is what the above code is essentially doing.
+
+## Acknowledgements
+We want to acknowledge the efforts of our molecular laboratory team who tiredlessly sequenced thousands of samples to generate the data used to evaluate this method.
+
+We also want to acknowledge our microbial discovery team who graciously provided samples and sequencing help throughout.
 
 ## References
 
